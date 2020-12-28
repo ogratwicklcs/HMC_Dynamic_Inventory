@@ -9,7 +9,7 @@ Currently the script will only create a single group called ```lpars``` and with
 **CONFIGURATION**
 All connection information is passed through envrionment variables.  Below are the envrionment variables that will need to be set:
 
-```hmchostname``` - The ip/hostname of the HMC API endpoint
+```hmchostname``` - The ip/hostname of the HMC API endpoint \n
 ```hmc_port``` - The port the API is accessible from (defaults to 443)
 ```hmcuser``` - The username to login
 ```hmcpassword``` - The password for the user you are logging in as 
