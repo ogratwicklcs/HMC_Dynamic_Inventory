@@ -47,7 +47,7 @@ class HMCInventory(object):
         }
 
         self.hmc_address = ""
-        self.hmc_port = 443
+        self.hmc_port = 0
         self.hmc_username = ""
         self.hmc_password = ""
         self.verify_ssl = True
@@ -57,7 +57,7 @@ class HMCInventory(object):
         self.build_cluster_inventory(inventory_type, auth_key, url)
 
     @staticmethod
-    def get_auth_key(url, hmc_user, hmc_password):
+    def get_auth_key(url, hmc_user, hmc_password, verify_ssl):
 
         try:
             auth_body = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -71,7 +71,7 @@ class HMCInventory(object):
             </LogonRequest>
             '''
             auth_response = requests.put(url + 'web/Logon', headers={
-                'Content-Type': 'application/vnd.ibm.powervm.web+xml; type=LogonRequest'}, data=auth_body, verify=False,
+                'Content-Type': 'application/vnd.ibm.powervm.web+xml; type=LogonRequest'}, data=auth_body, verify=verify_ssl,
                                          timeout=60)
             auth_key = json.loads(json.dumps(xtd.parse(auth_response.text)))['LogonResponse']['X-API-Session']['#text']
         except Exception as exception:
@@ -183,15 +183,15 @@ class HMCInventory(object):
                 print('A password must be configured for cluster.')
                 sys.exit(1)
             # SSL verification defaults to True unless specified otherwise
-            if os.environ.get('hmc_port'):
-                self.verify_ssl = os.environ.get('hmc_port')
+            if os.environ.get('hmc_verify'):
+                self.verify_ssl = True
             else:
                 self.verify_ssl = False
         except TypeError:
             print('No credentials found')
             sys.exit(1)
         url = "https://" + self.hmc_address + "/rest/api/"
-        auth_key, url = self.get_auth_key(url, self.hmc_username, self.hmc_password)
+        auth_key, url = self.get_auth_key(url, self.hmc_username, self.hmc_password, self.verify_ssl)
         return auth_key, url
 
 HMCInventory()
